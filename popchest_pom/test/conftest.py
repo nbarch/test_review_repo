@@ -1,22 +1,43 @@
 import pytest
-from popchest_pom.fixture.application import Application
+from popchest_pom.pages.webdriver_helper.helper import *
+from popchest_pom.pages.signup_page import *
+from popchest_pom.pages.single_video_page import *
+
+# todo add error/exception processing for tests
+
+@pytest.fixture(scope='session')
+def setup(request):
+    request.driver = driver_helper.get_webdriver()
+    yield request.driver
+    request.addfinalizer(driver_helper.tear_down)
+
+#
+# @pytest.fixture(scope="session")
+# def logged_in(request):
+#     request.driver = driver_helper.get_webdriver()
+#     tmp = SignupHelper()
+#     tmp.login("test1@distillery.com", "1234qwer")
+#     yield request.driver
+#     request.addfinalizer(driver_helper.tear_down)
+
+# @pytest.fixture(scope="session")
+# def open_video(request):
+#     request.driver = driver_helper.get_webdriver()
+#     tmp = SignupHelper()
+#     tmp.login("test1@distillery.com", "1234qwer")
+#     v = WatchVideoHelper()
+#     v.select_video()
+#     yield request.driver
+#     request.addfinalizer(driver_helper.tear_down)
+#
+
+@pytest.fixture(scope="session")
+def logged_in(setup):
+    tmp = SignupHelper()
+    tmp.login("test1@distillery.com", "1234qwer")
 
 
-@pytest.fixture
-def app(request):
-    fixture = Application()
-    request.addfinalizer(fixture.destroy)
-    return fixture
-
-# тестовый метод принимает в качестве параметра фикстуру
-def test_login(app):
-    app.session.login("mail", "pwd")
-
-def test_signup(app):
-    app.session.signup("mail", "pwd")
-    if app.session.ensure_signup():
-        return True
-
-def test_upload(app):
-    app.video.upload_by_click('path')
-
+@pytest.fixture(scope="session")
+def open_video(logged_in):
+    v = WatchVideoHelper()
+    v.select_video()
